@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Interactive Stopwatch</title>
+  <style>
+    body {
+      background: #a855f7;
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      color: white;
+    }
+
+    .container {
+      text-align: center;
+      background: #7e22ce;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 15px #6d28d9;
+    }
+
+    #display {
+      font-size: 48px;
+      margin: 20px 0;
+      animation: none;
+    }
+
+    .buttons button {
+      padding: 12px 24px;
+      margin: 5px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background-color: #4c1d95;
+      color: white;
+      transition: background 0.3s ease, transform 0.1s ease;
+    }
+
+    .buttons button:hover {
+      background-color: #6d28d9;
+      transform: scale(1.05);
+    }
+
+    #laps {
+      list-style: none;
+      padding: 0;
+      margin-top: 20px;
+    }
+
+    /* Pulse animation when running */
+    .pulse {
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>⏱️ Stopwatch</h1>
+    <div id="display">00:00:00</div>
+    <div class="buttons">
+      <button onclick="start()">Start</button>
+      <button onclick="pause()">Pause</button>
+      <button onclick="reset()">Reset</button>
+      <button onclick="lap()">Lap</button>
+    </div>
+    <ul id="laps"></ul>
+    <audio id="beep" src="https://www.soundjay.com/button/beep-07.wav" preload="auto"></audio>
+  </div>
+
+  <script>
+    let [hours, minutes, seconds] = [0, 0, 0];
+    let timer = null;
+
+    function updateDisplay() {
+      const display = document.getElementById("display");
+      let h = hours < 10 ? "0" + hours : hours;
+      let m = minutes < 10 ? "0" + minutes : minutes;
+      let s = seconds < 10 ? "0" + seconds : seconds;
+      display.innerText = `${h}:${m}:${s}`;
+    }
+
+    function stopwatch() {
+      seconds++;
+      if (seconds === 60) {
+        seconds = 0;
+        minutes++;
+      }
+      if (minutes === 60) {
+        minutes = 0;
+        hours++;
+      }
+      updateDisplay();
+    }
+
+    function playBeep() {
+      document.getElementById("beep").play();
+    }
+
+    function start() {
+      if (!timer) {
+        timer = setInterval(stopwatch, 1000);
+        playBeep();
+        document.getElementById("display").classList.add("pulse");
+      }
+    }
+
+    function pause() {
+      clearInterval(timer);
+      timer = null;
+      playBeep();
+      document.getElementById("display").classList.remove("pulse");
+    }
+
+    function reset() {
+      clearInterval(timer);
+      timer = null;
+      [hours, minutes, seconds] = [0, 0, 0];
+      updateDisplay();
+      playBeep();
+      document.getElementById("laps").innerHTML = "";
+      document.getElementById("display").classList.remove("pulse");
+    }
+
+    function lap() {
+      const lapTime = document.getElementById("display").innerText;
+      const lapList = document.getElementById("laps");
+      const li = document.createElement("li");
+      li.textContent = lapTime;
+      lapList.appendChild(li);
+      playBeep();
+    }
+  </script>
+</body>
+</html>
